@@ -29,5 +29,6 @@ export default defineConfig({
   build: {
     outDir: path.resolve(import.meta.dirname, "server/public"),
     emptyOutDir: true,
+    chunkSizeWarningLimit: 10000,
   },
 });

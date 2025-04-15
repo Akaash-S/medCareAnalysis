@@ -1,11 +1,15 @@
 import { Link, useLocation } from "wouter";
-import { Menu, X } from "lucide-react";
+import { Menu, X, UserCircle2 } from "lucide-react";
 import { useState } from "react";
 import { Button } from "./ui/button";
+import LanguageSelector from "./language-selector";
 
 export default function Header() {
   const [location] = useLocation();
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
+  // Mock user for demo - in a real app, this would come from auth state
+  const mockUser = { id: 1, username: "demo_user" };
+  const isLoggedIn = false; // Set to true to test with a logged-in user
 
   const toggleMobileMenu = () => {
     setIsMobileMenuOpen(!isMobileMenuOpen);
@@ -55,6 +59,15 @@ export default function Header() {
                   Medical Dictionary
                 </a>
               </Link>
+              <Link href="/insights">
+                <a className={`border-b-2 px-1 pt-1 inline-flex items-center text-sm font-medium ${
+                  isActive("/insights") 
+                    ? "border-primary text-primary" 
+                    : "border-transparent text-neutral-500 hover:border-neutral-300 hover:text-neutral-700"
+                }`}>
+                  My Insights
+                </a>
+              </Link>
               <Link href="/about">
                 <a className={`border-b-2 px-1 pt-1 inline-flex items-center text-sm font-medium ${
                   isActive("/about") 
@@ -68,12 +81,29 @@ export default function Header() {
           </div>
           
           <div className="flex items-center">
-            <Button variant="outline" className="rounded-md px-3 py-2 text-sm font-medium text-neutral-700 hover:bg-neutral-100 mr-3">
-              Sign In
-            </Button>
-            <Button className="bg-primary hover:bg-primary/90 text-white rounded-md px-3 py-2 text-sm font-medium shadow-sm">
-              Get Started
-            </Button>
+            {/* Language Selector */}
+            <div className="mr-4">
+              <LanguageSelector 
+                userId={isLoggedIn ? mockUser.id : undefined} 
+                currentLanguage="en"
+              />
+            </div>
+            
+            {isLoggedIn ? (
+              <Button variant="ghost" className="flex items-center">
+                <UserCircle2 className="h-6 w-6 mr-1" />
+                <span>{mockUser.username}</span>
+              </Button>
+            ) : (
+              <>
+                <Button variant="outline" className="rounded-md px-3 py-2 text-sm font-medium text-neutral-700 hover:bg-neutral-100 mr-3">
+                  Sign In
+                </Button>
+                <Button className="bg-primary hover:bg-primary/90 text-white rounded-md px-3 py-2 text-sm font-medium shadow-sm">
+                  Get Started
+                </Button>
+              </>
+            )}
             
             <div className="md:hidden ml-4">
               <button
@@ -102,6 +132,13 @@ export default function Header() {
               isActive("/dictionary") ? "text-primary" : "text-neutral-500 hover:bg-neutral-50 hover:text-neutral-700"
             }`}>
               Medical Dictionary
+            </a>
+          </Link>
+          <Link href="/insights">
+            <a className={`block px-3 py-2 rounded-md text-base font-medium ${
+              isActive("/insights") ? "text-primary" : "text-neutral-500 hover:bg-neutral-50 hover:text-neutral-700"
+            }`}>
+              My Insights
             </a>
           </Link>
           <Link href="/about">

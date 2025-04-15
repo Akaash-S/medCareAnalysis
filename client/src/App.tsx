@@ -6,6 +6,7 @@ import NotFound from "@/pages/not-found";
 import Home from "@/pages/home";
 import Dictionary from "@/pages/dictionary";
 import About from "@/pages/about";
+import Insights from "@/pages/insights";
 import Header from "@/components/header";
 import Footer from "@/components/footer";
 
@@ -17,6 +18,7 @@ function Router() {
         <Switch>
           <Route path="/" component={Home} />
           <Route path="/dictionary" component={Dictionary} />
+          <Route path="/insights" component={Insights} />
           <Route path="/about" component={About} />
           <Route component={NotFound} />
         </Switch>

@@ -58,9 +58,16 @@ export class DatabaseStorage implements IStorage {
 
   // Medical report methods
   async createMedicalReport(insertReport: InsertMedicalReport): Promise<MedicalReport> {
+    // Convert the identifiedTerms to a proper format for the database
+    // This ensures it's treated as a JSON array, fixing the type issue
+    const formattedReport = {
+      ...insertReport,
+      identifiedTerms: JSON.parse(JSON.stringify(insertReport.identifiedTerms))
+    };
+    
     const [report] = await db
       .insert(medicalReports)
-      .values(insertReport)
+      .values(formattedReport)
       .returning();
     return report;
   }

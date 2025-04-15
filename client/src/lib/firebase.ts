@@ -1,6 +1,7 @@
+// Firebase configuration and basic auth setup
 import { initializeApp } from "firebase/app";
 import { getAuth, GoogleAuthProvider, signInWithPopup, signOut, onAuthStateChanged, User } from "firebase/auth";
-import { createContext, useContext, useEffect, useState } from "react";
+import * as React from "react";
 
 // Firebase configuration
 const firebaseConfig = {
@@ -13,7 +14,7 @@ const firebaseConfig = {
 
 // Initialize Firebase
 const app = initializeApp(firebaseConfig);
-const auth = getAuth(app);
+export const auth = getAuth(app);
 const googleProvider = new GoogleAuthProvider();
 
 // Auth functions
@@ -36,21 +37,26 @@ export const logOut = async () => {
   }
 };
 
-// Auth context
-type AuthContextType = {
+// Create auth context types and context
+interface AuthContextType {
   currentUser: User | null;
   loading: boolean;
   signIn: () => Promise<User | null>;
   logOut: () => Promise<void>;
-};
+}
 
-const AuthContext = createContext<AuthContextType | null>(null);
+const AuthContext = React.createContext<AuthContextType | null>(null);
 
-export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
-  const [currentUser, setCurrentUser] = useState<User | null>(null);
-  const [loading, setLoading] = useState(true);
+// Auth provider component
+interface AuthProviderProps {
+  children: React.ReactNode;
+}
 
-  useEffect(() => {
+export const AuthProvider = ({ children }: AuthProviderProps) => {
+  const [currentUser, setCurrentUser] = React.useState<User | null>(null);
+  const [loading, setLoading] = React.useState(true);
+
+  React.useEffect(() => {
     const unsubscribe = onAuthStateChanged(auth, (user) => {
       setCurrentUser(user);
       setLoading(false);
@@ -69,26 +75,19 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     }
   };
 
-  const value: AuthContextType = {
-    currentUser,
-    loading,
-    signIn,
-    logOut,
-  };
-
-  return (
-    <AuthContext.Provider value={value}>
-      {!loading && children}
-    </AuthContext.Provider>
+  // Use createElement to avoid JSX parsing issues
+  return React.createElement(
+    AuthContext.Provider,
+    { value: { currentUser, loading, signIn, logOut } },
+    !loading ? children : null
   );
 };
 
+// Hook to access auth context
 export const useAuth = () => {
-  const context = useContext(AuthContext);
+  const context = React.useContext(AuthContext);
   if (!context) {
     throw new Error("useAuth must be used within an AuthProvider");
   }
   return context;
 };
-
-export { auth };

@@ -1,21 +1,34 @@
 import { Link, useLocation } from "wouter";
-import { Menu, X, UserCircle2 } from "lucide-react";
+import { Menu, X } from "lucide-react";
 import { useState } from "react";
 import { Button } from "./ui/button";
+import { useAuth } from "@/lib/firebase";
 import LanguageSelector from "./language-selector";
+import UserProfile from "./auth/user-profile";
+import AuthModal from "./auth/auth-modal";
 
 export default function Header() {
   const [location] = useLocation();
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
-  // Mock user for demo - in a real app, this would come from auth state
-  const mockUser = { id: 1, username: "demo_user" };
-  const isLoggedIn = false; // Set to true to test with a logged-in user
+  const [isAuthModalOpen, setIsAuthModalOpen] = useState(false);
+  const { currentUser } = useAuth();
+  
+  const isLoggedIn = !!currentUser;
+  const userId = isLoggedIn ? 1 : undefined; // In a real app, this would come from your backend
 
   const toggleMobileMenu = () => {
     setIsMobileMenuOpen(!isMobileMenuOpen);
   };
 
   const isActive = (path: string) => location === path;
+  
+  const openAuthModal = () => {
+    setIsAuthModalOpen(true);
+  };
+  
+  const closeAuthModal = () => {
+    setIsAuthModalOpen(false);
+  };
 
   return (
     <header className="bg-white shadow-sm">
@@ -84,22 +97,26 @@ export default function Header() {
             {/* Language Selector */}
             <div className="mr-4">
               <LanguageSelector 
-                userId={isLoggedIn ? mockUser.id : undefined} 
+                userId={userId} 
                 currentLanguage="en"
               />
             </div>
             
             {isLoggedIn ? (
-              <Button variant="ghost" className="flex items-center">
-                <UserCircle2 className="h-6 w-6 mr-1" />
-                <span>{mockUser.username}</span>
-              </Button>
+              <UserProfile />
             ) : (
               <>
-                <Button variant="outline" className="rounded-md px-3 py-2 text-sm font-medium text-neutral-700 hover:bg-neutral-100 mr-3">
+                <Button 
+                  variant="outline" 
+                  className="rounded-md px-3 py-2 text-sm font-medium text-neutral-700 hover:bg-neutral-100 mr-3"
+                  onClick={openAuthModal}
+                >
                   Sign In
                 </Button>
-                <Button className="bg-primary hover:bg-primary/90 text-white rounded-md px-3 py-2 text-sm font-medium shadow-sm">
+                <Button 
+                  className="bg-primary hover:bg-primary/90 text-white rounded-md px-3 py-2 text-sm font-medium shadow-sm"
+                  onClick={openAuthModal}
+                >
                   Get Started
                 </Button>
               </>
@@ -150,6 +167,12 @@ export default function Header() {
           </Link>
         </div>
       )}
+      
+      {/* Auth Modal */}
+      <AuthModal 
+        isOpen={isAuthModalOpen} 
+        onClose={closeAuthModal} 
+      />
     </header>
   );
 }

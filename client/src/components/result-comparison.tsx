@@ -2,7 +2,10 @@ import { useState } from "react";
 import { Card, CardContent } from "./ui/card";
 import { Button } from "./ui/button";
 import { MedicalTerm } from "@shared/schema";
-import { Copy, CheckIcon } from "lucide-react";
+import { Copy, CheckIcon, BarChart2, Volume2 } from "lucide-react";
+import VoiceReader from "./voice-reader";
+import DataVisualization from "./data-visualization";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 
 interface ResultComparisonProps {
   originalText: string;
@@ -17,6 +20,7 @@ export default function ResultComparison({
 }: ResultComparisonProps) {
   const [originalCopied, setOriginalCopied] = useState(false);
   const [simplifiedCopied, setSimplifiedCopied] = useState(false);
+  const [showTools, setShowTools] = useState(true);
 
   const copyToClipboard = async (text: string, type: 'original' | 'simplified') => {
     try {
@@ -69,12 +73,16 @@ export default function ResultComparison({
     return highlightedText;
   };
 
+  const toggleTools = () => {
+    setShowTools(prev => !prev);
+  };
+
   if (!originalText || !simplifiedText) {
     return null;
   }
 
   return (
-    <section className="mb-6">
+    <section className="mb-6 space-y-6">
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
         {/* Original Report */}
         <Card className="bg-white shadow-sm">
@@ -118,6 +126,85 @@ export default function ResultComparison({
           </CardContent>
         </Card>
       </div>
+      
+      {/* Visual and Audio Tools */}
+      <div className="flex justify-between items-center">
+        <h2 className="text-xl font-bold">Analysis Tools</h2>
+        <Button 
+          variant="outline" 
+          onClick={toggleTools}
+          className="text-sm"
+        >
+          {showTools ? "Hide Tools" : "Show Tools"}
+        </Button>
+      </div>
+      
+      {showTools && (
+        <Tabs defaultValue="visualization" className="w-full">
+          <TabsList className="grid w-full grid-cols-2">
+            <TabsTrigger value="visualization" className="flex items-center gap-2">
+              <BarChart2 className="h-4 w-4" />
+              <span>Data Visualization</span>
+            </TabsTrigger>
+            <TabsTrigger value="voice" className="flex items-center gap-2">
+              <Volume2 className="h-4 w-4" />
+              <span>Voice Reader</span>
+            </TabsTrigger>
+          </TabsList>
+          
+          <TabsContent value="visualization" className="mt-4">
+            <DataVisualization terms={identifiedTerms} />
+          </TabsContent>
+          
+          <TabsContent value="voice" className="mt-4">
+            <VoiceReader 
+              originalText={originalText}
+              simplifiedText={simplifiedText}
+              identifiedTerms={identifiedTerms}
+              useSimplified={true}
+            />
+          </TabsContent>
+        </Tabs>
+      )}
+      
+      {/* Medical Terms Section */}
+      {identifiedTerms.length > 0 && (
+        <div className="mt-8">
+          <h2 className="text-xl font-bold mb-4">Identified Medical Terms</h2>
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            {identifiedTerms.map((term, index) => (
+              <Card key={index} className="bg-white shadow-sm">
+                <CardContent className="p-4">
+                  <h3 className="font-bold text-lg text-primary-700">{term.term}</h3>
+                  <p className="text-neutral-600 text-sm">{term.definition}</p>
+                  <p className="mt-2 font-medium">Simplified: <span className="text-secondary-700">{term.simplified}</span></p>
+                  {term.normalRange && (
+                    <p className="text-xs text-neutral-500 mt-1">Normal Range: {term.normalRange}</p>
+                  )}
+                  {term.value && (
+                    <div className="flex items-center mt-1">
+                      <span className="text-xs text-neutral-500">Value: {term.value}</span>
+                      {term.status && (
+                        <span className={`ml-2 text-xs px-2 py-0.5 rounded-full ${
+                          term.status === 'normal' 
+                            ? 'bg-green-100 text-green-800' 
+                            : term.status === 'high' || term.status === 'borderline-high'
+                            ? 'bg-red-100 text-red-800'
+                            : term.status === 'low' || term.status === 'borderline-low'
+                            ? 'bg-blue-100 text-blue-800'
+                            : 'bg-orange-100 text-orange-800'
+                        }`}>
+                          {term.status.replace('-', ' ')}
+                        </span>
+                      )}
+                    </div>
+                  )}
+                </CardContent>
+              </Card>
+            ))}
+          </div>
+        </div>
+      )}
     </section>
   );
 }

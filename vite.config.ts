@@ -39,5 +39,14 @@ export default defineConfig(async () => {
       emptyOutDir: true,
       chunkSizeWarningLimit: 10000,
     },
+    server: {
+      hmr: {
+        timeout: 5000,
+        overlay: true
+      },
+      watch: {
+        usePolling: true
+      }
+    },
   };
 });

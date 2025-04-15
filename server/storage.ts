@@ -3,10 +3,10 @@ import {
   medicalReports, type MedicalReport, type InsertMedicalReport,
   MedicalTerm
 } from "@shared/schema";
+import { db } from "./db";
+import { eq } from "drizzle-orm";
 
-// modify the interface with any CRUD methods
-// you might need
-
+// Interface for all storage operations
 export interface IStorage {
   getUser(id: number): Promise<User | undefined>;
   getUserByUsername(username: string): Promise<User | undefined>;
@@ -18,52 +18,42 @@ export interface IStorage {
   getMedicalReportsByUserId(userId: number): Promise<MedicalReport[]>;
 }
 
-export class MemStorage implements IStorage {
-  private users: Map<number, User>;
-  private medicalReports: Map<number, MedicalReport>;
-  currentUserId: number;
-  currentReportId: number;
-
-  constructor() {
-    this.users = new Map();
-    this.medicalReports = new Map();
-    this.currentUserId = 1;
-    this.currentReportId = 1;
-  }
-
+// Database implementation of storage
+export class DatabaseStorage implements IStorage {
   async getUser(id: number): Promise<User | undefined> {
-    return this.users.get(id);
+    const [user] = await db.select().from(users).where(eq(users.id, id));
+    return user || undefined;
   }
 
   async getUserByUsername(username: string): Promise<User | undefined> {
-    return Array.from(this.users.values()).find(
-      (user) => user.username === username,
-    );
+    const [user] = await db.select().from(users).where(eq(users.username, username));
+    return user || undefined;
   }
 
   async createUser(insertUser: InsertUser): Promise<User> {
-    const id = this.currentUserId++;
-    const user: User = { ...insertUser, id };
-    this.users.set(id, user);
+    const [user] = await db
+      .insert(users)
+      .values(insertUser)
+      .returning();
     return user;
   }
 
   async createMedicalReport(insertReport: InsertMedicalReport): Promise<MedicalReport> {
-    const id = this.currentReportId++;
-    const report: MedicalReport = { ...insertReport, id };
-    this.medicalReports.set(id, report);
+    const [report] = await db
+      .insert(medicalReports)
+      .values(insertReport)
+      .returning();
     return report;
   }
 
   async getMedicalReport(id: number): Promise<MedicalReport | undefined> {
-    return this.medicalReports.get(id);
+    const [report] = await db.select().from(medicalReports).where(eq(medicalReports.id, id));
+    return report || undefined;
   }
 
   async getMedicalReportsByUserId(userId: number): Promise<MedicalReport[]> {
-    return Array.from(this.medicalReports.values()).filter(
-      (report) => report.userId === userId,
-    );
+    return await db.select().from(medicalReports).where(eq(medicalReports.userId, userId));
   }
 }
 
-export const storage = new MemStorage();
+export const storage = new DatabaseStorage();

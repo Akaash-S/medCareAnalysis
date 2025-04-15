@@ -42,40 +42,40 @@ export default function Header() {
             
             <nav className="hidden md:ml-6 md:flex md:space-x-8">
               <Link href="/">
-                <a className={`border-b-2 px-1 pt-1 inline-flex items-center text-sm font-medium ${
+                <div className={`border-b-2 px-1 pt-1 inline-flex items-center text-sm font-medium ${
                   isActive("/") 
                     ? "border-primary text-primary" 
                     : "border-transparent text-neutral-500 hover:border-neutral-300 hover:text-neutral-700"
                 }`}>
                   Simplify Report
-                </a>
+                </div>
               </Link>
               <Link href="/dictionary">
-                <a className={`border-b-2 px-1 pt-1 inline-flex items-center text-sm font-medium ${
+                <div className={`border-b-2 px-1 pt-1 inline-flex items-center text-sm font-medium ${
                   isActive("/dictionary") 
                     ? "border-primary text-primary" 
                     : "border-transparent text-neutral-500 hover:border-neutral-300 hover:text-neutral-700"
                 }`}>
                   Medical Dictionary
-                </a>
+                </div>
               </Link>
               <Link href="/insights">
-                <a className={`border-b-2 px-1 pt-1 inline-flex items-center text-sm font-medium ${
+                <div className={`border-b-2 px-1 pt-1 inline-flex items-center text-sm font-medium ${
                   isActive("/insights") 
                     ? "border-primary text-primary" 
                     : "border-transparent text-neutral-500 hover:border-neutral-300 hover:text-neutral-700"
                 }`}>
                   My Insights
-                </a>
+                </div>
               </Link>
               <Link href="/about">
-                <a className={`border-b-2 px-1 pt-1 inline-flex items-center text-sm font-medium ${
+                <div className={`border-b-2 px-1 pt-1 inline-flex items-center text-sm font-medium ${
                   isActive("/about") 
                     ? "border-primary text-primary" 
                     : "border-transparent text-neutral-500 hover:border-neutral-300 hover:text-neutral-700"
                 }`}>
                   About
-                </a>
+                </div>
               </Link>
             </nav>
           </div>
@@ -121,32 +121,32 @@ export default function Header() {
       {isMobileMenuOpen && (
         <div className="md:hidden border-t border-neutral-200 pt-2 pb-3 px-4">
           <Link href="/">
-            <a className={`block px-3 py-2 rounded-md text-base font-medium ${
+            <div className={`block px-3 py-2 rounded-md text-base font-medium ${
               isActive("/") ? "text-primary" : "text-neutral-500 hover:bg-neutral-50 hover:text-neutral-700"
             }`}>
               Simplify Report
-            </a>
+            </div>
           </Link>
           <Link href="/dictionary">
-            <a className={`block px-3 py-2 rounded-md text-base font-medium ${
+            <div className={`block px-3 py-2 rounded-md text-base font-medium ${
               isActive("/dictionary") ? "text-primary" : "text-neutral-500 hover:bg-neutral-50 hover:text-neutral-700"
             }`}>
               Medical Dictionary
-            </a>
+            </div>
           </Link>
           <Link href="/insights">
-            <a className={`block px-3 py-2 rounded-md text-base font-medium ${
+            <div className={`block px-3 py-2 rounded-md text-base font-medium ${
               isActive("/insights") ? "text-primary" : "text-neutral-500 hover:bg-neutral-50 hover:text-neutral-700"
             }`}>
               My Insights
-            </a>
+            </div>
           </Link>
           <Link href="/about">
-            <a className={`block px-3 py-2 rounded-md text-base font-medium ${
+            <div className={`block px-3 py-2 rounded-md text-base font-medium ${
               isActive("/about") ? "text-primary" : "text-neutral-500 hover:bg-neutral-50 hover:text-neutral-700"
             }`}>
               About
-            </a>
+            </div>
           </Link>
         </div>
       )}
